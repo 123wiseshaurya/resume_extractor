@@ -1,0 +1,6 @@
+Flask
+flask-cors
+openai==0.28
+PyMuPDF
+spacy
+python-dotenv==1.0.0
