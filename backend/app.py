@@ -20,7 +20,14 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 app = Flask(__name__)
-CORS(app)
+# Allow all origins and methods for CORS
+CORS(app, resources={
+    r"/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -183,18 +190,32 @@ def upload_pdf():
         return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 # --- Get stored resume parsing history ---
-@app.route('/history', methods=['GET'])
+@app.route('/history', methods=['GET', 'OPTIONS'])
 def history():
+    if request.method == 'OPTIONS':
+        # Handle preflight request
+        response = make_response()
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', '*')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        return response
+        
     records = []
     if os.path.exists(RESULTS_FILE):
         with open(RESULTS_FILE, "r") as f:
             for line in f:
-                try:
-                    records.append(json.loads(line.strip()))
-                except:
-                    continue
-    return jsonify(records[::-1])  # recent first
+                line = line.strip()
+                if line:  # Skip empty lines
+                    try:
+                        records.append(json.loads(line))
+                    except json.JSONDecodeError as e:
+                        print(f"Error parsing JSON line: {e}")
+                        continue
+    
+    response = jsonify(records[::-1])  # Return most recent first
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 # --- Start server ---
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5050, debug=True)

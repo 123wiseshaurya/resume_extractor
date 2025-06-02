@@ -56,7 +56,7 @@ function App() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get('/history');
+      const res = await axios.get(`${API_BASE}/history`);
       setHistory(res.data);
     } catch (e) {
       console.error("Error loading history", e);
@@ -91,17 +91,35 @@ function App() {
         </div>
       )}
 
-      <h2>Past Uploads</h2>
-      <div className="history-section">
-        {history.map((item, index) => (
-          <div key={index} className="history-item">
-            <button onClick={() => setExpandedIndex(index === expandedIndex ? null : index)}>
-              {new Date(item.timestamp).toLocaleString()}
-            </button>
-            {expandedIndex === index && <DisplayResult data={item} />}
+      {history.length > 0 && (
+        <>
+          <h2>Past Uploads</h2>
+          <div className="history-section">
+            {history
+              .filter(item => item && item.timestamp) // Only include items with timestamp
+              .map((item, index) => {
+                try {
+                  const date = new Date(item.timestamp);
+                  if (isNaN(date.getTime())) return null; // Skip invalid dates
+                  
+                  const dateDisplay = date.toLocaleString();
+                  
+                  return (
+                    <div key={index} className="history-item">
+                      <button onClick={() => setExpandedIndex(index === expandedIndex ? null : index)}>
+                        {dateDisplay}
+                      </button>
+                      {expandedIndex === index && <DisplayResult data={item} />}
+                    </div>
+                  );
+                } catch (e) {
+                  console.error('Error processing history item:', e);
+                  return null;
+                }
+              })}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 }

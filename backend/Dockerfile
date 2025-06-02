@@ -38,5 +38,5 @@ RUN python -c "import dotenv"
 # Expose port
 EXPOSE 5000
 
-# Run the Flask app
-CMD ["python", "app.py"]
+# Run the application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5050"]
