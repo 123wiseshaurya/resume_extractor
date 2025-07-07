@@ -2,6 +2,12 @@
 
 A full-stack application that extracts skills and relevant information from resumes using AI and NLP techniques. The application features a React frontend and a Python FastAPI backend, containerized with Docker for easy deployment.
 
+## Screenshots
+![image](https://github.com/user-attachments/assets/148da02d-4938-4627-a3b7-9ad8cd8acabe)
+
+![image](https://github.com/user-attachments/assets/117d9116-1ab6-4cdb-9368-00d54a2de6d9)
+
+
 ## Features
 
 - **Resume Parsing**: Extract key information from uploaded resumes (PDF/DOCX)
